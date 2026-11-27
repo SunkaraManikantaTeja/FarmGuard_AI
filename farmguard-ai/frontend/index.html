@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FarmGuard AI</title>
+<style>
+:root{--teal:#092D32;--teal2:#0d3a40;--pearl:#F2F1E9;--lime:#D3FF45;--bg:#092D32;--fg:#F2F1E9;--mut:rgba(242,241,233,.65);--line:rgba(242,241,233,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--teal);color:var(--fg);font-family:"Helvetica Neue",Arial,sans-serif;line-height:1.55}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:400;line-height:1.05;margin:0}
+a{color:inherit;text-decoration:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;gap:22px;align-items:center;padding:14px 5vw;padding-top:calc(14px + env(safe-area-inset-top,0px));background:rgba(9,45,50,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+nav b{color:var(--lime);margin-right:auto;letter-spacing:.14em}
+nav a{opacity:.8}nav a:hover{opacity:1;color:var(--lime)}
+@media(max-width:700px){nav a.h{display:none}}
+.btn{display:inline-block;padding:14px 26px;border-radius:99px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--lime);cursor:pointer;font-weight:700;transition:transform .2s,background .2s,color .2s;background:none;color:var(--lime)}
+.btn.p{background:var(--lime);color:var(--teal)}
+.btn:hover{transform:translateY(-3px);box-shadow:0 0 28px rgba(211,255,69,.35)}
+section{padding:90px 5vw}
+.hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding-top:110px}
+@media(max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(38px,6.4vw,84px)}
+.hero h1 em{color:var(--lime);font-style:normal}
+.hero p{max-width:520px;color:var(--mut);margin:22px 0 30px}
+.tag{font-size:12px;letter-spacing:.2em;color:var(--lime);text-transform:uppercase;margin-bottom:18px}
+canvas{width:100%;aspect-ratio:1;max-width:560px;justify-self:center}
+.stats{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:0 5vw}
+.stat{flex:1 1 200px;padding:34px 10px;border-right:1px solid var(--line)}
+.stat b{display:block;font-family:Georgia,serif;font-size:48px;font-weight:400;color:var(--lime)}
+.stat span{font-size:13px;color:var(--mut)}
+.note{font-size:12px;color:var(--mut);padding:10px 5vw}
+.light{background:var(--pearl);color:var(--teal);--mut:rgba(9,45,50,.65);--line:rgba(9,45,50,.18)}
+.light .btn{color:var(--teal);border-color:var(--teal)}
+.light .btn.p{background:var(--teal);color:var(--lime)}
+h2{font-size:clamp(32px,4.6vw,58px);margin-bottom:34px}
+.mods{display:grid;grid-template-columns:260px 1fr;gap:40px}
+@media(max-width:800px){.mods{grid-template-columns:1fr}}
+.tabs button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 0;font:inherit;color:inherit;cursor:pointer;opacity:.55;transition:.25s}
+.tabs button.on{opacity:1;color:var(--teal);padding-left:14px;border-left:4px solid var(--teal)}
+.tabs small{display:block;font-size:11px;letter-spacing:.15em}
+.panel{background:var(--teal);color:var(--pearl);border-radius:6px 60px 6px 60px;padding:36px;min-height:340px;position:relative;overflow:hidden}
+.panel h3{font-size:34px;color:var(--lime);margin-bottom:12px}
+.panel p{color:var(--mut);max-width:520px}
+.panel ul{padding-left:18px;color:var(--pearl)}
+.pulse{position:absolute;right:-40px;bottom:-40px;width:200px;height:200px;border-radius:50%;border:2px solid var(--lime);animation:pl 3s infinite}
+@keyframes pl{0%{transform:scale(.5);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+.drop{border:1.5px dashed var(--lime);border-radius:20px;padding:30px;text-align:center;cursor:pointer;position:relative;overflow:hidden}
+.wrap{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}}
+select,input[type=range]{width:100%;font:inherit}
+select{padding:12px;background:var(--teal2);color:var(--pearl);border:1px solid var(--line);border-radius:10px;margin:8px 0 16px}
+#prev{max-width:100%;max-height:260px;border-radius:12px;display:none;margin:0 auto}
+.scan{position:absolute;left:0;right:0;height:3px;background:var(--lime);box-shadow:0 0 20px var(--lime);display:none;animation:sc 1.4s linear infinite}
+@keyframes sc{from{top:0}to{top:100%}}
+.report{background:var(--teal2);border:1px solid var(--line);border-radius:14px;padding:24px;min-height:260px}
+.warn{display:inline-block;background:var(--lime);color:var(--teal);font-size:11px;font-weight:700;letter-spacing:.1em;padding:4px 10px;border-radius:99px;margin-bottom:12px}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden;margin:6px 0 16px}
+.bar i{display:block;height:100%;background:var(--teal);width:0;transition:width .6s}
+.light .bar i{background:var(--teal)}
+.row{display:flex;justify-content:space-between;font-size:14px}
+.sim label{font-size:13px;display:block;margin:14px 0 4px}
+.cmp{background:var(--teal);color:var(--pearl);border-radius:20px;padding:28px}
+.cmp .bar{background:rgba(242,241,233,.16)}.cmp .bar i{background:var(--lime)}
+footer{padding:40px 5vw;font-size:13px;color:var(--mut);border-top:1px solid var(--line)}
+.rv{opacity:0;transform:translateY(30px);transition:opacity .8s,transform .8s}.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}.rv{opacity:1;transform:none}}
+</style></head><body>
+<nav><b>FARMGUARD AI</b><a class="h" href="#home">Home</a><a href="#intel">Intelligence</a><a href="#detect">Detect</a><a href="#whatif">What-If</a><a class="h" href="#about">About</a></nav>
+
+<section class="hero" id="home">
+<div><div class="tag">● Crop protection intelligence</div>
+<h1>THE FUTURE OF CROP PROTECTION IS <em>INTELLIGENT.</em></h1>
+<p>From detecting invisible threats to predicting crop disease risks, FarmGuard AI transforms agricultural data into intelligent decisions that help protect farmers' livelihoods.</p>
+<a class="btn p" href="#intel">Explore FarmGuard</a> <a class="btn" href="#detect">Discover the Intelligence</a></div>
+<canvas id="cv" width="560" height="560" aria-label="Animated leaf scan visualization"></canvas>
+</section>
+
+<div class="stats" id="stats">
+<div class="stat"><b data-n="3">0</b><span>Languages planned: Telugu, English, Hindi</span></div>
+<div class="stat"><b data-n="6">0</b><span>Innovation modules</span></div>
+<div class="stat"><b data-n="10">0</b><span>Steps in the analysis journey</span></div>
+</div>
+<div class="note">Project objectives shown as targets. No accuracy or field-performance figures are claimed until the model is validated.</div>
+
+<section class="light" id="intel"><h2 class="rv">Six innovations.<br>One field-level intelligence.</h2>
+<div class="mods rv"><div class="tabs" id="tabs"></div><div class="panel" id="panel"></div></div></section>
+
+<section id="detect"><div class="tag">Module 02 · Disease Detection Engine</div><h2 class="rv">Show us the leaf.</h2>
+<div class="wrap rv"><div>
+<label>Language</label><select id="lang"><option value="en">English</option><option value="te">తెలుగు (Telugu)</option><option value="hi">हिन्दी (Hindi)</option></select>
+<label>Crop</label><select id="crop"><option>Rice</option><option>Tomato</option><option>Cotton</option><option>Chilli</option></select>
+<label class="drop" for="file" id="drop"><span id="dt">Tap to upload or capture a leaf photo</span><img id="prev" alt="Leaf preview"><div class="scan" id="scan"></div></label>
+<input id="file" type="file" accept="image/*" capture="environment" hidden>
+<p id="err" style="color:var(--lime);font-size:13px;min-height:20px"></p>
+<button class="btn p" id="go">Start analysis</button></div>
+<div class="report" id="rep"><div class="warn">DEMONSTRATION MODE</div><p style="color:var(--mut)">The report appears here. The AI model backend (MobileNetV2 + Grad-CAM) is not connected, so no real prediction is made.</p></div></div></section>
+
+<section class="light" id="whatif"><div class="tag" style="color:var(--teal)">Module 06 · What-If Simulator</div><h2 class="rv">Compare decisions, not guesses.</h2>
+<div class="wrap rv sim"><div>
+<label>Spray interval you follow: <b id="v1">14</b> days</label><input id="s1" type="range" min="5" max="30" value="14">
+<label>Field scouting per week: <b id="v2">1</b> times</label><input id="s2" type="range" min="0" max="7" value="1">
+<label>Humid, rainy days expected: <b id="v3">8</b> of 30</label><input id="s3" type="range" min="0" max="30" value="8">
+<p style="font-size:12px;color:var(--mut)">Illustrative toy model with assumed coefficients. Not a validated forecast and not a guarantee of any outcome.</p></div>
+<div class="cmp" id="cmp"></div></div></section>
+
+<section id="about"><div class="tag">About</div><h2 class="rv">We build intelligence around every field.</h2>
+<p style="max-width:640px;color:var(--mut)">FarmGuard AI is a multilingual crop disease prediction, prevention and decision-support concept. Estimated risk is never presented as confirmed disease, and every demonstration is labelled as such.</p></section>
+<footer>FarmGuard AI · Student innovation project · Demonstration build</footer>
+
+<script>
+(function(){
+var rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// hero canvas: leaf + scan ring + particles
+var c=document.getElementById('cv'),x=c.getContext('2d'),W=560,t=0,P=[];
+for(var i=0;i<60;i++)P.push({a:Math.random()*6.28,r:120+Math.random()*150,s:.002+Math.random()*.004});
+function leaf(){x.beginPath();x.moveTo(280,120);x.bezierCurveTo(430,190,430,370,280,450);x.bezierCurveTo(130,370,130,190,280,120);x.closePath()}
+function draw(){x.clearRect(0,0,W,W);
+x.strokeStyle='rgba(242,241,233,.18)';x.lineWidth=1;
+for(var k=1;k<=3;k++){x.beginPath();x.arc(280,285,110+k*55,0,6.28);x.stroke()}
+x.save();x.translate(280,285);x.rotate(t);x.strokeStyle='#D3FF45';x.lineWidth=3;x.beginPath();x.arc(0,0,275,0,1.1);x.stroke();x.restore();
+leaf();x.fillStyle='#0d3a40';x.fill();x.strokeStyle='#D3FF45';x.lineWidth=2;x.stroke();
+x.save();leaf();x.clip();x.strokeStyle='rgba(242,241,233,.35)';x.lineWidth=1.5;
+x.beginPath();x.moveTo(280,120);x.lineTo(280,450);x.stroke();
+for(var j=0;j<7;j++){var y=170+j*42;x.beginPath();x.moveTo(280,y+20);x.lineTo(180,y-15);x.moveTo(280,y+20);x.lineTo(380,y-15);x.stroke()}
+var sy=120+((Math.sin(t*3)+1)/2)*330;x.fillStyle='rgba(211,255,69,.14)';x.fillRect(0,sy-30,W,30);x.fillStyle='#D3FF45';x.fillRect(0,sy,W,2);
+x.restore();
+var sp=[[250,230],[320,300],[260,360]];sp.forEach(function(p,i){var r=7+3*Math.sin(t*4+i);x.strokeStyle='#D3FF45';x.lineWidth=2;x.beginPath();x.arc(p[0],p[1],r+6,0,6.28);x.stroke();x.fillStyle='rgba(211,255,69,.7)';x.beginPath();x.arc(p[0],p[1],3,0,6.28);x.fill()});
+x.font='11px monospace';x.fillStyle='#D3FF45';x.fillText('SCAN · ANOMALY ZONES: 3 (demo)',150,495);
+P.forEach(function(p){p.a+=p.s;x.fillStyle='rgba(242,241,233,.5)';x.fillRect(280+Math.cos(p.a)*p.r,285+Math.sin(p.a)*p.r,2,2)});
+if(!rm){t+=.012;requestAnimationFrame(draw)}}
+draw();
+// reveal + counters
+var io=new IntersectionObserver(function(e){e.forEach(function(en){if(en.isIntersecting)en.target.classList.add('in')})},{threshold:.15});
+document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+document.querySelectorAll('[data-n]').forEach(function(el){var n=+el.dataset.n,v=0;(function s(){v+=Math.max(1,n/30);if(v>=n||rm){el.textContent=n;return}el.textContent=Math.floor(v);setTimeout(s,40)})()});
+// modules
+var M=[["01","AI Farm Digital Twin","A living model of the field: crop, variety, sowing date, growth stage, irrigation, observations and past disease records. Change an input and the twin updates.",["Crop and growth stage","Irrigation and observations","Previous disease records"]],
+["02","Disease Detection Engine","Upload or capture a leaf photo and get a predicted disease, confidence, alternatives, and an uncertainty warning when confidence is low. Grad-CAM shows where the model looked.",["Confidence and alternatives","Grad-CAM explanation","Low-confidence warning"]],
+["03","Disease Risk Forecasting","Weather, growth stage and history combine into an estimated risk with a trend. Estimated risk is always kept separate from confirmed disease.",["Estimated risk and trend","Environmental conditions","Preventive suggestions"]],
+["04","Farmer Voice Intelligence","Speak in Telugu, Hindi or English and hear answers back. Example: నా వరి పంట ఆకులపై మచ్చలు వస్తున్నాయి. ఏం చేయాలి?",["Speech-to-text","Text-to-speech","Language switching"]],
+["05","Community Early-Warning","Anonymised village-level symptom reports reveal possible clusters and trigger local awareness alerts. Demonstrations use sample data only.",["Village-level reports","Possible clusters","Community alerts"]],
+["06","What-If Simulator","Compare following recommended practices with continuing current practice: estimated risk, cost and loss exposure, with limitations stated.",["Risk and cost comparison","Loss exposure","Advantages and limits"]]];
+var tb=document.getElementById('tabs'),pn=document.getElementById('panel');
+function show(i){[].forEach.call(tb.children,function(b,j){b.classList.toggle('on',i==j)});var m=M[i];
+pn.innerHTML='<div class="pulse"></div><div style="color:var(--lime);letter-spacing:.2em;font-size:12px">MODULE '+m[0]+'</div><h3>'+m[1]+'</h3><p>'+m[2]+'</p><ul>'+m[3].map(function(s){return'<li>'+s+'</li>'}).join('')+'</ul>'}
+M.forEach(function(m,i){var b=document.createElement('button');b.innerHTML='<small>'+m[0]+'</small>'+m[1];b.onclick=function(){show(i)};tb.appendChild(b)});show(0);
+// detection demo
+var f=document.getElementById('file'),pv=document.getElementById('prev'),er=document.getElementById('err'),sc=document.getElementById('scan'),rp=document.getElementById('rep'),has=false;
+f.onchange=function(){er.textContent='';var fl=f.files[0];if(!fl)return;
+if(!/^image\//.test(fl.type)){er.textContent='Please choose an image file.';return}
+if(fl.size>8e6){er.textContent='Image is larger than 8 MB.';return}
+pv.src=URL.createObjectURL(fl);pv.style.display='block';document.getElementById('dt').style.display='none';has=true};
+var L={en:["Analysis report (demo)","Predicted disease","Confidence","Not computed: no model connected","Recommendation","Confirm with a local agriculture officer before any treatment."],te:["విశ్లేషణ నివేదిక (డెమో)","అంచనా వ్యాధి","నమ్మకం","లెక్కించలేదు: మోడల్ అనుసంధానం కాలేదు","సూచన","చికిత్సకు ముందు స్థానిక వ్యవసాయ అధికారిని సంప్రదించండి."],hi:["विश्लेषण रिपोर्ट (डेमो)","अनुमानित रोग","विश्वास","गणना नहीं: मॉडल जुड़ा नहीं है","सुझाव","उपचार से पहले स्थानीय कृषि अधिकारी से पुष्टि करें।"]};
+document.getElementById('go').onclick=function(){if(!has){er.textContent='Upload a leaf image first.';return}
+er.textContent='';sc.style.display='block';rp.innerHTML='<div class="warn">SCANNING…</div><p style="color:var(--mut)">Reading leaf texture and colour patterns</p>';
+var fd=new FormData();fd.append('file',f.files[0]);fd.append('crop',document.getElementById('crop').value);fd.append('language',document.getElementById('lang').value);var R=null;fetch('/api/predict',{method:'POST',body:fd}).then(function(r){return r.json()}).then(function(j){R=j}).catch(function(){});setTimeout(function(){sc.style.display='none';var l=L[document.getElementById('lang').value],cr=document.getElementById('crop').value;
+rp.innerHTML='<div class="warn">'+(R&&R.mode==='model'?'MODEL PREDICTION · VERIFY WITH AN EXPERT':'DEMONSTRATION · NOT A REAL PREDICTION')+'</div><h3 style="font-size:26px;color:var(--lime)">'+l[0]+'</h3><p>'+cr+'</p><div class="row"><span>'+l[1]+'</span><b>'+(R&&R.mode==='model'?R.prediction:'—')+'</b></div><div class="row"><span>'+l[2]+'</span><b style="font-size:12px">'+(R&&R.mode==='model'?Math.round(R.confidence*100)+'%'+(R.low_confidence?' (low, uncertain)':''):l[3])+'</b></div><div class="bar"><i style="width:0"></i></div><div class="row"><span>'+l[4]+'</span></div><p style="color:var(--mut);font-size:14px">'+l[5]+'</p>'},2600)};
+// simulator
+var s1=document.getElementById('s1'),s2=document.getElementById('s2'),s3=document.getElementById('s3'),cm=document.getElementById('cmp');
+function risk(iv,sc,hu){return Math.max(5,Math.min(95,20+hu*1.6+iv*1.1-sc*4))}
+function sim(){var a=+s1.value,b=+s2.value,h=+s3.value;
+v1.textContent=a;v2.textContent=b;v3.textContent=h;
+var cur=risk(a,b,h),rec=risk(10,4,h),cc=Math.round(900+(30/a)*350),rc=Math.round(900+(30/10)*350+4*60);
+function blk(n,r,cost){return'<div class="row"><b>'+n+'</b><span>Risk ~'+Math.round(r)+'%</span></div><div class="bar"><i style="width:'+r+'%"></i></div><div class="row" style="color:var(--mut)"><span>Mgmt cost ~₹'+cost+'/acre</span><span>Loss exposure ~'+Math.round(r*.6)+'%</span></div><br>'}
+cm.innerHTML=blk('Current practice',cur,cc)+blk('Recommended practice',rec,rc)+'<p style="font-size:12px;color:var(--mut);margin:0">Estimates from assumed coefficients, for demonstration only.</p>'}
+[s1,s2,s3].forEach(function(s){s.oninput=sim});sim();
+})();
+</script></body></html>
